@@ -8,15 +8,16 @@
 #include <iostream>
 #include <cstdlib>
 #include <vector>
-
+using namespace std; // Per estalviar codi
 //consts
 const unsigned int MIN_NUM_FEATURES = 300; //minimum number of point fetaures
+float factor;  //numero entre 0.0 i 1.0 que permet modificar la mascarà, variant així l'area total de la imatge on es busquen els keypoints.
 
 int main(int argc, char *argv[])
 {
     cv::VideoCapture camera; //OpenCV video capture object
     cv::Mat image; //OpenCV image object
-	int cam_id; //camera id . Associated to device number in /dev/videoX
+	  int cam_id; //camera id . Associated to device number in /dev/videoX
     cv::Ptr<cv::ORB> orb_detector = cv::ORB::create(); //ORB point feature detector
     orb_detector->setMaxFeatures(MIN_NUM_FEATURES);
     std::vector<cv::KeyPoint> point_set; //set of point features
@@ -37,7 +38,11 @@ int main(int argc, char *argv[])
 			break;
 	}
 
-	//advertising to the user
+  //Es demana a l'usuari que introdueixi un valor pel paràmetre factor
+  cout<<"Introduce a number between 0.0 and 1.0 to determine the size of the scanning area: "; cin>>factor;
+
+
+  //advertising to the user
 	std::cout << "Opening video device " << cam_id << std::endl;
 
     //open the video stream and make sure it's opened
@@ -62,8 +67,13 @@ int main(int argc, char *argv[])
         //clear previous points
         point_set.clear();
 
-        //detect and compute(extract) features
-        orb_detector->detectAndCompute(image, cv::noArray(), point_set, descriptor_set);
+        //Es defineix la mascara en funció del paràmetre "factor"
+        cv::Mat mask(cv::Mat::zeros(image.size(),CV_8U));
+        mask(cv::Rect(0,0,image.cols*factor,image.rows*factor))=1;
+
+
+        //detect and compute(extract) features, el segon argument fa referencia a la mascara previament definida
+        orb_detector->detectAndCompute(image, mask, point_set, descriptor_set);
 
         //draw points on the image
         cv::drawKeypoints( image, point_set, image, 255, cv::DrawMatchesFlags::DEFAULT );
@@ -75,5 +85,5 @@ int main(int argc, char *argv[])
 
 		//Waits 30 millisecond to check if 'q' key has been pressed. If so, breaks the loop. Otherwise continues.
     	if( (unsigned char)(cv::waitKey(30) & 0xff) == 'q' ) break;
-    }   
+    }
 }
