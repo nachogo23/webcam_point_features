@@ -1,6 +1,7 @@
 # webcam_point_features
 Detection of ORB features from online webcam imges.
 
+Repositori original: https://github.com/beta-robots/webcam_point_features
 
 ORB (Oriented FAST and Rotated BRIEF) és un algoritme de detecció de punts utilitzat, per exemple, en visió artificial pel reconeixement d'objectes o per la reconstrucció 3D. Aquest metode es basa en la fusió de dos algoritmes. 
 
